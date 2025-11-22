@@ -1,11 +1,11 @@
 import { useState } from "react";
-import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { StatsCard } from "@/components/StatsCard";
 import { ParkingGrid } from "@/components/ParkingGrid";
 import { VehicleHistoryTable } from "@/components/VehicleHistoryTable";
+import { PlateInput } from "@/components/PlateInput";
 import { 
   Search, 
   LayoutGrid, 
@@ -61,11 +61,11 @@ const Index = () => {
           
           {/* Search Bar */}
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-            <Input
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4 z-10" />
+            <PlateInput
               placeholder="BUSCAR PLACA..."
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={setSearchQuery}
               className="pl-10"
             />
           </div>
@@ -239,9 +239,11 @@ const Index = () => {
               <CardContent>
                 <div className="mb-4">
                   <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                    <Input
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4 z-10" />
+                    <PlateInput
                       placeholder="BUSCAR PLACA..."
+                      value={searchQuery}
+                      onChange={setSearchQuery}
                       className="pl-10"
                     />
                   </div>
