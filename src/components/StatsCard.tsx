@@ -20,18 +20,18 @@ export function StatsCard({ title, value, subtitle, icon: Icon, colorScheme }: S
 
   return (
     <Card className="overflow-hidden">
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-medium text-muted-foreground">
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3 sm:pb-2">
+        <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">
           {title}
         </CardTitle>
-        <div className={cn("p-2 rounded-lg", colorClasses[colorScheme])}>
-          <Icon className="h-4 w-4" />
+        <div className={cn("p-1.5 sm:p-2 rounded-lg", colorClasses[colorScheme])}>
+          <Icon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
         </div>
       </CardHeader>
-      <CardContent>
-        <div className="text-2xl font-bold">{value}</div>
+      <CardContent className="pb-4">
+        <div className="text-xl sm:text-2xl font-bold">{value}</div>
         {subtitle && (
-          <p className="text-xs text-muted-foreground mt-1">{subtitle}</p>
+          <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">{subtitle}</p>
         )}
       </CardContent>
     </Card>
