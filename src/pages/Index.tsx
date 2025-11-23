@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -6,6 +6,9 @@ import { StatsCard } from "@/components/StatsCard";
 import { ParkingGrid } from "@/components/ParkingGrid";
 import { VehicleHistoryTable } from "@/components/VehicleHistoryTable";
 import { PlateInput } from "@/components/PlateInput";
+import { OccupySpotDialog } from "@/components/OccupySpotDialog";
+import { ViewSpotDialog } from "@/components/ViewSpotDialog";
+import { useParkingSpots } from "@/hooks/useParkingSpots";
 import { 
   Search, 
   LayoutGrid, 
@@ -21,36 +24,91 @@ import {
 const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [showMonthlyStats, setShowMonthlyStats] = useState(false);
+  const [occupyDialogOpen, setOccupyDialogOpen] = useState(false);
+  const [viewDialogOpen, setViewDialogOpen] = useState(false);
+  const [selectedSpot, setSelectedSpot] = useState<{ number: number; type: "car" | "motorcycle" } | null>(null);
+  
+  const {
+    occupiedSpots,
+    history,
+    occupySpot,
+    vacateSpot,
+    calculateCurrentValue,
+    calculateDuration,
+  } = useParkingSpots();
 
-  // Mock data - in a real app, this would come from a database
-  const todayEarnings = 216.71;
-  const todayExits = 2;
-  const carSpotsOccupied = 0;
   const totalCarSpots = 30;
-  const motorcycleSpotsOccupied = 0;
   const totalMotorcycleSpots = 30;
+  
+  const carSpotsOccupied = useMemo(() => {
+    return Array.from(occupiedSpots.values()).filter(
+      (spot) => spot.spotNumber >= 1 && spot.spotNumber <= 30
+    ).length;
+  }, [occupiedSpots]);
+
+  const motorcycleSpotsOccupied = useMemo(() => {
+    return Array.from(occupiedSpots.values()).filter(
+      (spot) => spot.spotNumber >= 31 && spot.spotNumber <= 60
+    ).length;
+  }, [occupiedSpots]);
+
   const totalOccupied = carSpotsOccupied + motorcycleSpotsOccupied;
   const totalSpots = totalCarSpots + totalMotorcycleSpots;
+
+  const todayEarnings = useMemo(() => {
+    return history.reduce((sum, record) => {
+      const value = parseFloat(record.value.replace("R$ ", "").replace(",", "."));
+      return sum + value;
+    }, 0);
+  }, [history]);
+
+  const todayExits = history.length;
   const averageStayMinutes = 650;
 
-  const vehicleHistory = [
-    {
-      licensePlate: "SM03F33",
-      type: "car" as const,
-      spot: 1,
-      entryTime: "22/11/25 06:23",
-      exitTime: "22/11/25 09:10",
-      duration: "2h 47min",
-    },
-    {
-      licensePlate: "SMO-3210",
-      type: "car" as const,
-      spot: 2,
-      entryTime: "21/11/25 11:42",
-      exitTime: "22/11/25 06:35",
-      duration: "18h 53min",
-    },
-  ];
+  const handleSpotClick = (spotNumber: number) => {
+    const spot = occupiedSpots.get(spotNumber);
+    const type = spotNumber <= 30 ? "car" : "motorcycle";
+    
+    if (spot) {
+      setSelectedSpot({ number: spotNumber, type });
+      setViewDialogOpen(true);
+    } else {
+      setSelectedSpot({ number: spotNumber, type });
+      setOccupyDialogOpen(true);
+    }
+  };
+
+  const handleOccupyConfirm = (licensePlate: string) => {
+    if (selectedSpot) {
+      occupySpot(selectedSpot.number, licensePlate, selectedSpot.type);
+    }
+  };
+
+  const handleVacate = () => {
+    if (selectedSpot) {
+      vacateSpot(selectedSpot.number);
+    }
+  };
+
+  const carOccupiedSpots = useMemo(() => {
+    const map = new Map();
+    occupiedSpots.forEach((spot, number) => {
+      if (number >= 1 && number <= 30) {
+        map.set(number, spot);
+      }
+    });
+    return map;
+  }, [occupiedSpots]);
+
+  const motorcycleOccupiedSpots = useMemo(() => {
+    const map = new Map();
+    occupiedSpots.forEach((spot, number) => {
+      if (number >= 31 && number <= 60) {
+        map.set(number, spot);
+      }
+    });
+    return map;
+  }, [occupiedSpots]);
 
   return (
     <div className="min-h-screen bg-background pb-4">
@@ -105,7 +163,7 @@ const Index = () => {
                 </div>
               </CardHeader>
               <CardContent className="pb-4">
-                <div className="text-2xl sm:text-3xl font-bold">R$ {todayEarnings.toFixed(2)}</div>
+                <div className="text-2xl sm:text-3xl font-bold">R$ {todayEarnings.toFixed(2).replace(".", ",")}</div>
                 <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">{todayExits} saídas</p>
                 
                 <Button
@@ -203,7 +261,8 @@ const Index = () => {
                   startNumber={1}
                   endNumber={30}
                   type="car"
-                  occupiedSpots={new Set()}
+                  occupiedSpots={carOccupiedSpots}
+                  onSpotClick={handleSpotClick}
                 />
               </CardContent>
             </Card>
@@ -223,7 +282,8 @@ const Index = () => {
                   startNumber={31}
                   endNumber={60}
                   type="motorcycle"
-                  occupiedSpots={new Set()}
+                  occupiedSpots={motorcycleOccupiedSpots}
+                  onSpotClick={handleSpotClick}
                 />
               </CardContent>
             </Card>
@@ -250,12 +310,29 @@ const Index = () => {
                     />
                   </div>
                 </div>
-                <VehicleHistoryTable records={vehicleHistory} />
+                <VehicleHistoryTable records={history} />
               </CardContent>
             </Card>
           </TabsContent>
         </Tabs>
       </div>
+
+      <OccupySpotDialog
+        open={occupyDialogOpen}
+        onOpenChange={setOccupyDialogOpen}
+        spotNumber={selectedSpot?.number || 0}
+        spotType={selectedSpot?.type || "car"}
+        onConfirm={handleOccupyConfirm}
+      />
+
+      <ViewSpotDialog
+        open={viewDialogOpen}
+        onOpenChange={setViewDialogOpen}
+        spot={selectedSpot ? occupiedSpots.get(selectedSpot.number) || null : null}
+        onVacate={handleVacate}
+        calculateDuration={calculateDuration}
+        calculateCurrentValue={calculateCurrentValue}
+      />
     </div>
   );
 };

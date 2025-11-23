@@ -1,10 +1,11 @@
 import { ParkingSpot } from "./ParkingSpot";
+import { OccupiedSpot } from "@/hooks/useParkingSpots";
 
 interface ParkingGridProps {
   startNumber: number;
   endNumber: number;
   type: "car" | "motorcycle";
-  occupiedSpots?: Set<number>;
+  occupiedSpots?: Map<number, OccupiedSpot>;
   onSpotClick?: (spotNumber: number) => void;
 }
 
@@ -12,7 +13,7 @@ export function ParkingGrid({
   startNumber, 
   endNumber, 
   type, 
-  occupiedSpots = new Set(),
+  occupiedSpots = new Map(),
   onSpotClick 
 }: ParkingGridProps) {
   const spots = Array.from(
@@ -22,15 +23,20 @@ export function ParkingGrid({
 
   return (
     <div className="grid grid-cols-3 gap-2 sm:gap-3 md:gap-4">
-      {spots.map((spotNumber) => (
-        <ParkingSpot
-          key={spotNumber}
-          number={spotNumber}
-          type={type}
-          occupied={occupiedSpots.has(spotNumber)}
-          onClick={() => onSpotClick?.(spotNumber)}
-        />
-      ))}
+      {spots.map((spotNumber) => {
+        const occupiedSpot = occupiedSpots.get(spotNumber);
+        return (
+          <ParkingSpot
+            key={spotNumber}
+            number={spotNumber}
+            type={type}
+            occupied={!!occupiedSpot}
+            licensePlate={occupiedSpot?.licensePlate}
+            entryTime={occupiedSpot?.entryTime}
+            onClick={() => onSpotClick?.(spotNumber)}
+          />
+        );
+      })}
     </div>
   );
 }
