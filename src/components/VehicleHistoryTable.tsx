@@ -17,6 +17,7 @@ interface VehicleRecord {
   entryTime: string;
   exitTime: string;
   duration: string;
+  value: string;
 }
 
 interface VehicleHistoryTableProps {
@@ -35,12 +36,13 @@ export function VehicleHistoryTable({ records }: VehicleHistoryTableProps) {
             <TableHead className="text-xs sm:text-sm whitespace-nowrap">Entrada</TableHead>
             <TableHead className="text-xs sm:text-sm whitespace-nowrap">Saída</TableHead>
             <TableHead className="text-xs sm:text-sm whitespace-nowrap">Duração</TableHead>
+            <TableHead className="text-xs sm:text-sm whitespace-nowrap">Valor</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {records.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={6} className="text-center text-muted-foreground text-xs sm:text-sm py-8">
+              <TableCell colSpan={7} className="text-center text-muted-foreground text-xs sm:text-sm py-8">
                 Nenhum registro encontrado
               </TableCell>
             </TableRow>
@@ -80,6 +82,9 @@ export function VehicleHistoryTable({ records }: VehicleHistoryTableProps) {
                 </TableCell>
                 <TableCell className="whitespace-nowrap">
                   <Badge variant="outline" className="text-[10px] sm:text-xs">{record.duration}</Badge>
+                </TableCell>
+                <TableCell className="whitespace-nowrap">
+                  <span className="font-semibold text-xs sm:text-sm">{record.value}</span>
                 </TableCell>
               </TableRow>
             ))
