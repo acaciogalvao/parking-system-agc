@@ -52,46 +52,46 @@ export function ViewSpotDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 text-lg sm:text-xl">
-            <Icon className="h-5 w-5" />
+      <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
+        <DialogHeader className="pb-2">
+          <DialogTitle className="flex items-center gap-2 text-xl sm:text-2xl">
+            <Icon className="h-6 w-6" />
             Vaga {spot.spotNumber} - Ocupada
           </DialogTitle>
         </DialogHeader>
-        <div className="space-y-4 py-4">
-          <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
-            <span className="text-sm font-medium">Placa</span>
-            <span className="text-sm font-bold">{spot.licensePlate}</span>
+        <div className="space-y-3 py-2">
+          <div className="flex items-center justify-between p-4 bg-muted rounded-lg border border-border">
+            <span className="text-sm font-medium text-muted-foreground">Placa</span>
+            <span className="text-base sm:text-lg font-bold">{spot.licensePlate}</span>
           </div>
-          <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
-            <span className="text-sm font-medium">Tipo</span>
-            <span className="text-sm">{typeLabel}</span>
+          <div className="flex items-center justify-between p-4 bg-muted rounded-lg border border-border">
+            <span className="text-sm font-medium text-muted-foreground">Tipo</span>
+            <span className="text-base font-semibold">{typeLabel}</span>
           </div>
-          <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
-            <span className="text-sm font-medium">Tarifa</span>
-            <span className="text-sm font-bold">{rate}</span>
+          <div className="flex items-center justify-between p-4 bg-muted rounded-lg border border-border">
+            <span className="text-sm font-medium text-muted-foreground">Tarifa</span>
+            <span className="text-base font-bold">{rate}</span>
           </div>
-          <div className="flex items-center justify-between p-3 bg-earnings border-earnings-accent/20 rounded-lg">
+          <div className="flex items-center justify-between p-4 bg-earnings/20 border-2 border-earnings-accent/30 rounded-lg">
             <span className="text-sm font-medium flex items-center gap-2">
-              <Clock className="h-4 w-4" />
+              <Clock className="h-5 w-5" />
               Tempo
             </span>
-            <span className="text-sm font-bold tabular-nums">
+            <span className="text-base sm:text-lg font-bold tabular-nums">
               {calculateDuration(spot)}
             </span>
           </div>
-          <div className="flex items-center justify-between p-3 bg-earnings border-earnings-accent/20 rounded-lg">
+          <div className="flex items-center justify-between p-4 bg-earnings/20 border-2 border-earnings-accent/30 rounded-lg">
             <span className="text-sm font-medium flex items-center gap-2">
-              <DollarSign className="h-4 w-4" />
+              <DollarSign className="h-5 w-5" />
               Valor Atual
             </span>
-            <span className="text-lg font-bold tabular-nums">
+            <span className="text-xl sm:text-2xl font-bold tabular-nums text-earnings-accent">
               {calculateCurrentValue(spot)}
             </span>
           </div>
-          <div className="text-xs text-muted-foreground p-2 bg-muted/50 rounded">
-            Entrada: {spot.entryTime.toLocaleString("pt-BR", {
+          <div className="text-xs text-muted-foreground p-3 bg-muted/50 rounded border border-border">
+            <span className="font-medium">Entrada:</span> {spot.entryTime.toLocaleString("pt-BR", {
               day: "2-digit",
               month: "2-digit",
               year: "2-digit",
@@ -100,17 +100,19 @@ export function ViewSpotDialog({
             })}
           </div>
         </div>
-        <DialogFooter className="flex-col sm:flex-row gap-2">
+        <DialogFooter className="flex-col sm:flex-row gap-2 pt-2">
           <Button
             variant="outline"
             onClick={() => onOpenChange(false)}
-            className="w-full sm:w-auto"
+            className="w-full sm:w-auto order-2 sm:order-1"
+            size="lg"
           >
             Fechar
           </Button>
           <Button
             onClick={handleVacate}
-            className="w-full sm:w-auto bg-earnings-accent hover:bg-earnings-accent/90"
+            className="w-full sm:w-auto order-1 sm:order-2 bg-earnings-accent hover:bg-earnings-accent/90"
+            size="lg"
           >
             Liberar Vaga
           </Button>
