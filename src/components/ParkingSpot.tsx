@@ -39,28 +39,30 @@ export function ParkingSpot({ number, type, occupied, licensePlate, entryTime, o
     <Card
       onClick={onClick}
       className={cn(
-        "cursor-pointer transition-all hover:shadow-md active:scale-95",
-        type === "car" ? "bg-car-spot border-car-accent/20" : "bg-motorcycle-spot border-motorcycle-accent/20",
-        occupied && "opacity-80"
+        "cursor-pointer transition-all hover:shadow-lg active:scale-[0.98] border-2",
+        type === "car" ? "bg-car-spot border-car-accent/30" : "bg-motorcycle-spot border-motorcycle-accent/30",
+        occupied && "ring-2 ring-offset-2",
+        occupied && type === "car" && "ring-car-accent/50",
+        occupied && type === "motorcycle" && "ring-motorcycle-accent/50"
       )}
     >
-      <CardContent className="flex flex-col items-center justify-center p-2 sm:p-3 h-full min-h-[80px] sm:min-h-[100px]">
-        <div className="text-base sm:text-lg font-bold mb-1">{number}</div>
+      <CardContent className="flex flex-col items-center justify-center p-3 sm:p-4 h-full min-h-[110px] sm:min-h-[120px]">
+        <div className="text-xl sm:text-2xl font-bold mb-2">{number}</div>
         <Icon className={cn(
-          "h-4 w-4 sm:h-5 sm:w-5 mb-1",
+          "h-6 w-6 sm:h-7 sm:w-7 mb-2",
           type === "car" ? "text-car-accent" : "text-motorcycle-accent"
         )} />
         {occupied && licensePlate ? (
-          <>
-            <span className="text-[9px] sm:text-[10px] font-semibold text-center mb-0.5">
+          <div className="flex flex-col items-center gap-1 w-full">
+            <span className="text-[11px] sm:text-xs font-bold text-center px-2 py-0.5 bg-background/60 rounded">
               {licensePlate}
             </span>
-            <span className="text-[8px] sm:text-[9px] text-muted-foreground text-center tabular-nums">
+            <span className="text-[10px] sm:text-[11px] font-medium text-muted-foreground text-center tabular-nums">
               {duration}
             </span>
-          </>
+          </div>
         ) : (
-          <span className="text-[10px] sm:text-xs text-muted-foreground text-center">
+          <span className="text-xs sm:text-sm font-medium text-muted-foreground text-center">
             Livre
           </span>
         )}

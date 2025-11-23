@@ -53,40 +53,46 @@ export function OccupySpotDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 text-lg sm:text-xl">
-            <Icon className="h-5 w-5" />
+        <DialogHeader className="pb-2">
+          <DialogTitle className="flex items-center gap-2 text-xl sm:text-2xl">
+            <Icon className="h-6 w-6" />
             Ocupar Vaga {spotNumber}
           </DialogTitle>
         </DialogHeader>
-        <div className="space-y-4 py-4">
-          <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
-            <span className="text-sm font-medium">Tipo</span>
-            <span className="text-sm">{typeLabel}</span>
+        <div className="space-y-4 py-2">
+          <div className="flex items-center justify-between p-4 bg-muted rounded-lg border border-border">
+            <span className="text-sm font-medium text-muted-foreground">Tipo</span>
+            <span className="text-base font-semibold">{typeLabel}</span>
           </div>
-          <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
-            <span className="text-sm font-medium">Tarifa</span>
-            <span className="text-sm font-bold">{rate}</span>
+          <div className="flex items-center justify-between p-4 bg-muted rounded-lg border border-border">
+            <span className="text-sm font-medium text-muted-foreground">Tarifa</span>
+            <span className="text-base font-bold">{rate}</span>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="plate">Placa do Veículo</Label>
+            <Label htmlFor="plate" className="text-sm font-semibold">Placa do Veículo</Label>
             <PlateInput
               id="plate"
               value={licensePlate}
               onChange={setLicensePlate}
               placeholder="AAA-9999 ou AAA9A99"
+              className="h-12 text-base"
             />
           </div>
         </div>
-        <DialogFooter className="flex-col sm:flex-row gap-2">
+        <DialogFooter className="flex-col sm:flex-row gap-2 pt-2">
           <Button
             variant="outline"
             onClick={() => onOpenChange(false)}
-            className="w-full sm:w-auto"
+            className="w-full sm:w-auto order-2 sm:order-1"
+            size="lg"
           >
             Cancelar
           </Button>
-          <Button onClick={handleConfirm} className="w-full sm:w-auto">
+          <Button 
+            onClick={handleConfirm} 
+            className="w-full sm:w-auto order-1 sm:order-2"
+            size="lg"
+          >
             Confirmar
           </Button>
         </DialogFooter>

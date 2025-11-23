@@ -22,7 +22,7 @@ export function ParkingGrid({
   );
 
   return (
-    <div className="grid grid-cols-3 gap-2 sm:gap-3 md:gap-4">
+    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
       {spots.map((spotNumber) => {
         const occupiedSpot = occupiedSpots.get(spotNumber);
         return (
