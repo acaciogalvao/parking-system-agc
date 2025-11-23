@@ -12,14 +12,20 @@ interface ParkingSpotProps {
   onClick?: () => void;
 }
 
+const HOURLY_RATES = {
+  car: 10,
+  motorcycle: 7,
+};
+
 export function ParkingSpot({ number, type, occupied, licensePlate, entryTime, onClick }: ParkingSpotProps) {
   const Icon = type === "car" ? Car : Bike;
   const [duration, setDuration] = useState("");
+  const [value, setValue] = useState("R$ 0,00");
 
   useEffect(() => {
     if (!occupied || !entryTime) return;
 
-    const updateDuration = () => {
+    const updateInfo = () => {
       const now = new Date();
       const durationMs = now.getTime() - entryTime.getTime();
       const totalSeconds = Math.floor(durationMs / 1000);
@@ -27,13 +33,19 @@ export function ParkingSpot({ number, type, occupied, licensePlate, entryTime, o
       const minutes = Math.floor((totalSeconds % 3600) / 60);
       const seconds = totalSeconds % 60;
       setDuration(`${hours}h ${minutes}m ${seconds}s`);
+
+      // Calculate value
+      const durationMinutes = durationMs / 60000;
+      const hourlyRate = HOURLY_RATES[type];
+      const currentValue = (durationMinutes / 60) * hourlyRate;
+      setValue(`R$ ${currentValue.toFixed(2).replace(".", ",")}`);
     };
 
-    updateDuration();
-    const interval = setInterval(updateDuration, 1000);
+    updateInfo();
+    const interval = setInterval(updateInfo, 1000);
 
     return () => clearInterval(interval);
-  }, [occupied, entryTime]);
+  }, [occupied, entryTime, type]);
   
   return (
     <Card
@@ -46,23 +58,26 @@ export function ParkingSpot({ number, type, occupied, licensePlate, entryTime, o
         occupied && type === "motorcycle" && "ring-motorcycle-accent/50"
       )}
     >
-      <CardContent className="flex flex-col items-center justify-center p-3 sm:p-4 h-full min-h-[110px] sm:min-h-[120px]">
-        <div className="text-xl sm:text-2xl font-bold mb-2">{number}</div>
+      <CardContent className="flex flex-col items-center justify-center p-3 sm:p-4 h-full min-h-[140px] sm:min-h-[150px]">
+        <div className="text-2xl sm:text-3xl font-bold mb-2">{number}</div>
         <Icon className={cn(
-          "h-6 w-6 sm:h-7 sm:w-7 mb-2",
+          "h-7 w-7 sm:h-8 sm:w-8 mb-2",
           type === "car" ? "text-car-accent" : "text-motorcycle-accent"
         )} />
         {occupied && licensePlate ? (
-          <div className="flex flex-col items-center gap-1 w-full">
-            <span className="text-[11px] sm:text-xs font-bold text-center px-2 py-0.5 bg-background/60 rounded">
+          <div className="flex flex-col items-center gap-1.5 w-full">
+            <span className="text-xs sm:text-sm font-bold text-center px-2 py-1 bg-background/70 rounded-md">
               {licensePlate}
             </span>
-            <span className="text-[10px] sm:text-[11px] font-medium text-muted-foreground text-center tabular-nums">
+            <span className="text-sm sm:text-base font-bold text-center tabular-nums bg-earnings/30 px-2 py-0.5 rounded">
               {duration}
+            </span>
+            <span className="text-base sm:text-lg font-bold text-earnings-accent text-center tabular-nums">
+              {value}
             </span>
           </div>
         ) : (
-          <span className="text-xs sm:text-sm font-medium text-muted-foreground text-center">
+          <span className="text-sm sm:text-base font-medium text-muted-foreground text-center">
             Livre
           </span>
         )}
