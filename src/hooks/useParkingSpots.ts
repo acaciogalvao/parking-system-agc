@@ -66,13 +66,19 @@ export function useParkingSpots() {
     if (spot) {
       const exitTime = new Date();
       const durationMs = exitTime.getTime() - spot.entryTime.getTime();
-      const durationMinutes = Math.floor(durationMs / 60000);
-      const hours = Math.floor(durationMinutes / 60);
-      const minutes = durationMinutes % 60;
+      
+      // Cálculo preciso em minutos (com decimais) para o valor
+      const durationMinutesExact = durationMs / 60000;
+      
+      // Cálculo para exibição da duração (sem segundos)
+      const durationMinutesRounded = Math.floor(durationMinutesExact);
+      const hours = Math.floor(durationMinutesRounded / 60);
+      const minutes = durationMinutesRounded % 60;
       const durationStr = `${hours}h ${minutes}min`;
       
+      // Usa o valor exato (com decimais) para calcular o preço
       const hourlyRate = HOURLY_RATES[spot.type];
-      const value = (durationMinutes / 60) * hourlyRate;
+      const value = (durationMinutesExact / 60) * hourlyRate;
       const valueStr = `R$ ${value.toFixed(2).replace(".", ",")}`;
 
       const exitRecord: VehicleExit = {
