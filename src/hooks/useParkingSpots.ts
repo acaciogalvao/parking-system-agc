@@ -15,6 +15,7 @@ export interface VehicleExit {
   exitTime: string;
   duration: string;
   value: string;
+  paymentMethod: "pix" | "card" | "cash";
 }
 
 const HOURLY_RATES = {
@@ -33,6 +34,7 @@ export function useParkingSpots() {
       exitTime: "22/11/25 09:10",
       duration: "2h 47min",
       value: "R$ 27,83",
+      paymentMethod: "pix",
     },
     {
       licensePlate: "SMO-3210",
@@ -42,6 +44,7 @@ export function useParkingSpots() {
       exitTime: "22/11/25 06:35",
       duration: "18h 53min",
       value: "R$ 188,83",
+      paymentMethod: "card",
     },
   ]);
 
@@ -58,7 +61,7 @@ export function useParkingSpots() {
     });
   };
 
-  const vacateSpot = (spotNumber: number) => {
+  const vacateSpot = (spotNumber: number, paymentMethod: "pix" | "card" | "cash") => {
     const spot = occupiedSpots.get(spotNumber);
     if (spot) {
       const exitTime = new Date();
@@ -92,6 +95,7 @@ export function useParkingSpots() {
         }),
         duration: durationStr,
         value: valueStr,
+        paymentMethod,
       };
 
       setHistory((prev) => [exitRecord, ...prev]);
