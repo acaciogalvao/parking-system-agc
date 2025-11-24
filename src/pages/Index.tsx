@@ -84,9 +84,9 @@ const Index = () => {
     }
   };
 
-  const handleVacate = () => {
+  const handleVacate = (paymentMethod: "pix" | "card" | "cash") => {
     if (selectedSpot) {
-      vacateSpot(selectedSpot.number);
+      vacateSpot(selectedSpot.number, paymentMethod);
     }
   };
 

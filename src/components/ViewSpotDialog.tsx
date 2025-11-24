@@ -7,14 +7,17 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Car, Bike, Clock, DollarSign } from "lucide-react";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Car, Bike, Clock, DollarSign, Smartphone, CreditCard, Banknote } from "lucide-react";
 import { OccupiedSpot } from "@/hooks/useParkingSpots";
+import { toast } from "@/hooks/use-toast";
 
 interface ViewSpotDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   spot: OccupiedSpot | null;
-  onVacate: () => void;
+  onVacate: (paymentMethod: "pix" | "card" | "cash") => void;
   calculateDuration: (spot: OccupiedSpot) => string;
   calculateCurrentValue: (spot: OccupiedSpot) => string;
 }
@@ -28,6 +31,7 @@ export function ViewSpotDialog({
   calculateCurrentValue,
 }: ViewSpotDialogProps) {
   const [, setTick] = useState(0);
+  const [paymentMethod, setPaymentMethod] = useState<"pix" | "card" | "cash">("pix");
 
   useEffect(() => {
     if (!open || !spot) return;
@@ -46,7 +50,15 @@ export function ViewSpotDialog({
   const rate = spot.type === "car" ? "R$ 10,00/h" : "R$ 7,00/h";
 
   const handleVacate = () => {
-    onVacate();
+    if (!paymentMethod) {
+      toast({
+        title: "Selecione um método de pagamento",
+        description: "Por favor, selecione como o cliente irá pagar.",
+        variant: "destructive",
+      });
+      return;
+    }
+    onVacate(paymentMethod);
     onOpenChange(false);
   };
 
@@ -98,6 +110,52 @@ export function ViewSpotDialog({
               hour: "2-digit",
               minute: "2-digit",
             })}
+          </div>
+          
+          <div className="space-y-3 pt-2">
+            <Label className="text-base font-semibold">Método de Pagamento</Label>
+            <RadioGroup value={paymentMethod} onValueChange={(value) => setPaymentMethod(value as "pix" | "card" | "cash")}>
+              <div className="flex flex-col gap-3">
+                <label
+                  htmlFor="pix"
+                  className={`flex items-center gap-3 p-4 border-2 rounded-lg cursor-pointer transition-all ${
+                    paymentMethod === "pix"
+                      ? "border-primary bg-primary/5"
+                      : "border-border hover:border-primary/50"
+                  }`}
+                >
+                  <RadioGroupItem value="pix" id="pix" />
+                  <Smartphone className="h-5 w-5 text-primary" />
+                  <span className="text-base font-medium">Pix</span>
+                </label>
+                
+                <label
+                  htmlFor="card"
+                  className={`flex items-center gap-3 p-4 border-2 rounded-lg cursor-pointer transition-all ${
+                    paymentMethod === "card"
+                      ? "border-primary bg-primary/5"
+                      : "border-border hover:border-primary/50"
+                  }`}
+                >
+                  <RadioGroupItem value="card" id="card" />
+                  <CreditCard className="h-5 w-5 text-primary" />
+                  <span className="text-base font-medium">Cartão</span>
+                </label>
+                
+                <label
+                  htmlFor="cash"
+                  className={`flex items-center gap-3 p-4 border-2 rounded-lg cursor-pointer transition-all ${
+                    paymentMethod === "cash"
+                      ? "border-primary bg-primary/5"
+                      : "border-border hover:border-primary/50"
+                  }`}
+                >
+                  <RadioGroupItem value="cash" id="cash" />
+                  <Banknote className="h-5 w-5 text-primary" />
+                  <span className="text-base font-medium">Dinheiro</span>
+                </label>
+              </div>
+            </RadioGroup>
           </div>
         </div>
         <DialogFooter className="flex-col sm:flex-row gap-2 pt-2">
