@@ -70,11 +70,21 @@ export function useParkingSpots() {
       // Cálculo preciso em minutos (com decimais) para o valor
       const durationMinutesExact = durationMs / 60000;
       
-      // Cálculo para exibição da duração (sem segundos)
-      const durationMinutesRounded = Math.floor(durationMinutesExact);
-      const hours = Math.floor(durationMinutesRounded / 60);
-      const minutes = durationMinutesRounded % 60;
-      const durationStr = `${hours}h ${minutes}min`;
+      // Cálculo COMPLETO para exibição da duração (com horas, minutos E segundos)
+      const totalSeconds = Math.floor(durationMs / 1000);
+      const hours = Math.floor(totalSeconds / 3600);
+      const minutes = Math.floor((totalSeconds % 3600) / 60);
+      const seconds = totalSeconds % 60;
+      
+      // Formata a duração incluindo segundos quando necessário
+      let durationStr = "";
+      if (hours > 0) {
+        durationStr = `${hours}h ${minutes}min`;
+      } else if (minutes > 0) {
+        durationStr = `${minutes}min ${seconds}s`;
+      } else {
+        durationStr = `${seconds}s`;
+      }
       
       // Usa o valor exato (com decimais) para calcular o preço
       const hourlyRate = HOURLY_RATES[spot.type];
@@ -129,7 +139,15 @@ export function useParkingSpots() {
     const hours = Math.floor(totalSeconds / 3600);
     const minutes = Math.floor((totalSeconds % 3600) / 60);
     const seconds = totalSeconds % 60;
-    return `${hours}h ${minutes}min ${seconds}s`;
+    
+    // Formata de forma inteligente baseado no tempo
+    if (hours > 0) {
+      return `${hours}h ${minutes}min`;
+    } else if (minutes > 0) {
+      return `${minutes}min ${seconds}s`;
+    } else {
+      return `${seconds}s`;
+    }
   };
 
   return {
