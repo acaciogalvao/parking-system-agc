@@ -23,30 +23,74 @@ const HOURLY_RATES = {
   motorcycle: 7,
 };
 
+// Funções auxiliares para localStorage
+const loadOccupiedSpots = (): Map<number, OccupiedSpot> => {
+  try {
+    const serializedState = localStorage.getItem("occupiedSpots");
+    if (serializedState === null) {
+      return new Map();
+    }
+    const parsed = JSON.parse(serializedState);
+    // Converte a lista de objetos de volta para Map e a string de data para objeto Date
+    const map = new Map<number, OccupiedSpot>();
+    parsed.forEach((item: { spotNumber: number; licensePlate: string; type: "car" | "motorcycle"; entryTime: string }) => {
+      map.set(item.spotNumber, {
+        ...item,
+        entryTime: new Date(item.entryTime),
+      });
+    });
+    return map;
+  } catch (err) {
+    console.error("Could not load occupied spots from localStorage", err);
+    return new Map();
+  }
+};
+
+const saveOccupiedSpots = (state: Map<number, OccupiedSpot>) => {
+  try {
+    // Converte o Map para uma lista de objetos para serialização
+    const serializedState = JSON.stringify(Array.from(state.values()));
+    localStorage.setItem("occupiedSpots", serializedState);
+  } catch (err) {
+    console.error("Could not save occupied spots to localStorage", err);
+  }
+};
+
+const loadHistory = (): VehicleExit[] => {
+  try {
+    const serializedState = localStorage.getItem("history");
+    if (serializedState === null) {
+      return [];
+    }
+    return JSON.parse(serializedState);
+  } catch (err) {
+    console.error("Could not load history from localStorage", err);
+    return [];
+  }
+};
+
+const saveHistory = (state: VehicleExit[]) => {
+  try {
+    const serializedState = JSON.stringify(state);
+    localStorage.setItem("history", serializedState);
+  } catch (err) {
+    console.error("Could not save history to localStorage", err);
+  }
+};
+
 export function useParkingSpots() {
-  const [occupiedSpots, setOccupiedSpots] = useState<Map<number, OccupiedSpot>>(new Map());
-  const [history, setHistory] = useState<VehicleExit[]>([
-    {
-      licensePlate: "SM03F33",
-      type: "car",
-      spot: 1,
-      entryTime: "22/11/25 06:23",
-      exitTime: "22/11/25 09:10",
-      duration: "2h 47min",
-      value: "R$ 27,83",
-      paymentMethod: "pix",
-    },
-    {
-      licensePlate: "SMO-3210",
-      type: "car",
-      spot: 2,
-      entryTime: "21/11/25 11:42",
-      exitTime: "22/11/25 06:35",
-      duration: "18h 53min",
-      value: "R$ 188,83",
-      paymentMethod: "card",
-    },
-  ]);
+  const [occupiedSpots, setOccupiedSpots] = useState<Map<number, OccupiedSpot>>(() => loadOccupiedSpots());
+  const [history, setHistory] = useState<VehicleExit[]>(() => loadHistory());
+
+  // Efeito para salvar occupiedSpots sempre que mudar
+  useEffect(() => {
+    saveOccupiedSpots(occupiedSpots);
+  }, [occupiedSpots]);
+
+  // Efeito para salvar history sempre que mudar
+  useEffect(() => {
+    saveHistory(history);
+  }, [history]);
 
   const occupySpot = (spotNumber: number, licensePlate: string, type: "car" | "motorcycle") => {
     setOccupiedSpots((prev) => {
